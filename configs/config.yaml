@@ -1,0 +1,63 @@
+# Пути к данным
+data:
+  train_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_train_mini.csv"
+  val_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val_mini.csv"
+  # val_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val.csv"
+
+  
+# Настройки модели
+model:
+  name: "vits14_reg_dinov2"  # Доступные варианты: vits16_dino, vitb16_dino, vits14_dinov2, vits14_reg_dinov2, vitb14_reg_dinov2, vitl14_reg_dinov2
+  save_dir: "models/"  # Директория для сохранения весов модели
+
+# Параметры обучения
+training:
+  epochs: 8
+  batch_size: 32
+  seed: 0
+  device: "cuda:0"
+  validate_every: 1  # Проводить валидацию каждые N эпох
+  num_workers: 4  # Количество workers для DataLoader
+  
+# Настройки оптимизатора
+optimizer:
+  name: "Adam"  # Варианты: Adam, AdamW
+  lr: 1e-4
+  weight_decay: 0.0001  # Только для AdamW
+  
+# Настройки планировщика скорости обучения
+scheduler:
+  name: "CosineAnnealingWarmRestarts"  # Варианты: CosineAnnealingWarmRestarts, StepLR, ReduceLROnPlateau
+  T_0: 5  # Для CosineAnnealingWarmRestarts
+  T_mult: 2  # Для CosineAnnealingWarmRestarts
+  eta_min: 1e-6  # Минимальное значение lr
+  
+# Настройки функции потерь и майнера
+loss:
+  name: "TripletLoss"  # Варианты: TripletLoss, ArcFaceLoss
+  margin: 0.3  # Отступ для TripletLoss
+  
+miner:
+  name: "AllTripletsMiner"  # Варианты: AllTripletsMiner, HardTripletsMiner
+  
+# Настройки сэмплера
+sampler:
+  name: "CategoryBalanceSampler"  # Варианты: BalanceSampler, CategoryBalanceSampler
+  n_labels: 8  # Количество меток в батче
+  n_instances: 6  # Количество экземпляров каждой метки
+  n_categories: 2  # Только для CategoryBalanceSampler
+  
+# Настройки валидации
+validation:
+  batch_size: 32
+  num_workers: 4
+  n_std: 2  # Для AdaptiveThresholding
+  
+# Настройки логирования и экспериментов
+experiment:
+  save_dir: "experiments/"  # Директория для сохранения результатов экспериментов
+  save_results: true  # Сохранять результаты в CSV
+  tensorboard: true  # Использовать TensorBoard
+  save_best_only: true  # Сохранять только лучшую модель на основе метрики
+  metric_for_best: "eer"  # Метрика для отслеживания лучшей модели (eer или loss)
+  save_every: 5  # Также сохранять модель каждые N эпох
