@@ -1,9 +1,9 @@
 # Пути к данным
 data:
-  # train_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_train_mini.csv"
-  # val_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val_mini.csv"
-  train_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_train.csv"
-  val_path: /fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val.csv
+  train_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_train_mini_mini.csv"
+  val_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val_mini.csv"
+  # train_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_train.csv"
+  # val_path: /fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val.csv
 
   
 # Настройки модели
@@ -13,7 +13,7 @@ model:
 
 # Параметры обучения
 training:
-  epochs: 6
+  epochs: 18
   batch_size: 32
   seed: 0
   device: "cuda:1"
@@ -23,8 +23,8 @@ training:
 # Настройки оптимизатора
 optimizer:
   name: "Adam"  # Варианты: Adam, AdamW
-  lr: 1e-4
-  weight_decay: 0.0001  # Только для AdamW
+  lr: 1e-5
+  # weight_decay: 0.0001  # Только для AdamW
   
 # Настройки планировщика скорости обучения
 scheduler:
@@ -36,28 +36,29 @@ scheduler:
 # Настройки функции потерь и майнера
 # loss:
 #   name: "TripletLoss"  # Варианты: TripletLoss, ArcFaceLoss
-#   margin: 0.6  # Отступ для TripletLoss
+#   margin: 0.2  # Отступ для TripletLoss
 
 loss:
   name: "ArcFaceLoss"
   remap_labels2ArcFace: true
-  scale: 40.0           # Стандартно 30.0, увеличение делает разделение более резким
-  margin_arcface: 0.6   # Стандартно 0.5, увеличение усиливает разделение классов  
+  scale: 30.0           # Стандартно 30.0, увеличение делает разделение более резким
+  margin_arcface: 0.2   # Стандартно 0.5, увеличение усиливает разделение классов  
   smoothing_epsilon: 0.1  # Опциональный параметр сглаживания меток
 
+
 miner:
-  name: "HardTripletsMiner" # "AllTripletsMiner"  # Варианты: AllTripletsMiner, HardTripletsMiner
+  name: "AllTripletsMiner"   # "AllTripletsMiner"  # Варианты: AllTripletsMiner, HardTripletsMiner
   
 # Настройки сэмплера
 sampler:
-  name: "CategoryBalanceSampler"  # Варианты: BalanceSampler, CategoryBalanceSampler
-  n_labels: 8  # Количество меток в батче
-  n_instances: 7  # Количество экземпляров каждой метки
+  name:  CategoryBalanceSampler # Варианты: BalanceSampler, CategoryBalanceSampler "CategoryBalanceSampler"  # BalanceSampler
+  n_labels: 6  # Количество меток в батче
+  n_instances: 6  # Количество экземпляров каждой метки
   n_categories: 2  # Только для CategoryBalanceSampler
   
 # Настройки валидации
 validation:
-  batch_size: 64
+  batch_size: 32
   num_workers: 4
   n_std: 2  # Для AdaptiveThresholding
   
@@ -69,3 +70,16 @@ experiment:
   save_best_only: true  # Сохранять только лучшую модель на основе метрики
   metric_for_best: "eer"  # Метрика для отслеживания лучшей модели (eer или loss)
   save_every: 5  # Также сохранять модель каждые N эпох
+
+
+
+
+
+
+
+
+
+
+
+
+
