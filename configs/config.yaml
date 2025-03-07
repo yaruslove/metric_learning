@@ -1,9 +1,9 @@
 # Пути к данным
 data:
-  train_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_train_mini_mini.csv"
-  val_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val_mini.csv"
-  # train_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_train.csv"
-  # val_path: /fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val.csv
+  # train_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_train_mini_mini.csv"
+  # val_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val_mini.csv"
+  train_path: "/fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_train.csv"
+  val_path: /fanxiangssd/yaroslav/hacaton_deepface_new/code/create_df/scripts/002_create_df_TrainVal/df_val.csv
 
   
 # Настройки модели
@@ -34,16 +34,16 @@ scheduler:
   eta_min: 1e-6  # Минимальное значение lr
   
 # Настройки функции потерь и майнера
-# loss:
-#   name: "TripletLoss"  # Варианты: TripletLoss, ArcFaceLoss
-#   margin: 0.2  # Отступ для TripletLoss
-
 loss:
-  name: "ArcFaceLoss"
-  remap_labels2ArcFace: true
-  scale: 30.0           # Стандартно 30.0, увеличение делает разделение более резким
-  margin_arcface: 0.2   # Стандартно 0.5, увеличение усиливает разделение классов  
-  smoothing_epsilon: 0.1  # Опциональный параметр сглаживания меток
+  name: "TripletLoss"  # Варианты: TripletLoss, ArcFaceLoss
+  margin: 0.2  # Отступ для TripletLoss
+
+# loss:
+#   name: "ArcFaceLoss"
+#   remap_labels2ArcFace: true
+#   scale: 30.0           # Стандартно 30.0, увеличение делает разделение более резким
+#   margin_arcface: 0.2   # Стандартно 0.5, увеличение усиливает разделение классов  
+#   smoothing_epsilon: 0.1  # Опциональный параметр сглаживания меток
 
 
 miner:
@@ -52,8 +52,8 @@ miner:
 # Настройки сэмплера
 sampler:
   name:  CategoryBalanceSampler # Варианты: BalanceSampler, CategoryBalanceSampler "CategoryBalanceSampler"  # BalanceSampler
-  n_labels: 6  # Количество меток в батче
-  n_instances: 6  # Количество экземпляров каждой метки
+  n_labels: 8  # Количество меток в батче
+  n_instances: 10  # Количество экземпляров каждой метки
   n_categories: 2  # Только для CategoryBalanceSampler
   
 # Настройки валидации
