@@ -64,12 +64,16 @@ def main():
     logger.info(f"Установлен seed: {seed}")
     
     # Загружаем данные
-    train_dataset, val_dataset, _, _ = load_datasets(config)
+    train_dataset, val_dataset, _, _, label_to_index = load_datasets(config)
     logger.info(f"Загружено {len(train_dataset)} тренировочных образцов")
     logger.info(f"Загружено {len(val_dataset)} валидационных образцов")
-    
+
+    if label_to_index is not None:
+        logger.info(f"Создано отображение для {len(label_to_index)} уникальных меток (ремаппинг для ArcFaceLoss)")
+
     # Настраиваем модель и компоненты
-    model, optimizer, scheduler, criterion, miner = setup_model_components(config, device)
+    model, optimizer, scheduler, criterion, miner = setup_model_components(config, device, train_dataset, label_to_index)
+
     logger.info(f"Модель {config['model']['name']} инициализирована")
     logger.info(f"Оптимизатор: {config['optimizer']['name']}")
     logger.info(f"Планировщик: {config['scheduler']['name']}")

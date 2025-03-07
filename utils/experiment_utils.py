@@ -31,6 +31,7 @@ def create_experiment_dir(config: Dict[str, Any]) -> Path:
     
     # Формируем название директории
     experiment_name = f"{hash_str}_{timestamp}"
+    print(f"experiment_name {experiment_name}")
     
     # Создаем директорию
     save_dir = Path(config["experiment"]["save_dir"])

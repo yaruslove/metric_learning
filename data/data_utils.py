@@ -25,6 +25,31 @@ def get_transforms(model_name: str) -> Tuple:
     return transform, transform
 
 
+# def load_datasets(config: Dict[str, Any]) -> Tuple:
+#     """
+#     Загружает датасеты для обучения и валидации.
+    
+#     Args:
+#         config: Конфигурация
+        
+#     Returns:
+#         Кортеж из (train_dataset, val_dataset, transform_train, transform_val)
+#     """
+#     # Получаем трансформации
+#     transform_train, transform_val = get_transforms(config["model"]["name"])
+    
+#     # Загружаем данные
+#     df_train = pd.read_csv(config["data"]["train_path"])
+#     df_val = pd.read_csv(config["data"]["val_path"])
+    
+#     # Создаем датасеты
+#     train_dataset = d.ImageLabeledDataset(df_train, transform=transform_train)
+#     val_dataset = d.ImageQueryGalleryLabeledDataset(df_val, transform=transform_val)
+    
+#     return train_dataset, val_dataset, transform_train, transform_val
+
+
+
 def load_datasets(config: Dict[str, Any]) -> Tuple:
     """
     Загружает датасеты для обучения и валидации.
@@ -33,7 +58,7 @@ def load_datasets(config: Dict[str, Any]) -> Tuple:
         config: Конфигурация
         
     Returns:
-        Кортеж из (train_dataset, val_dataset, transform_train, transform_val)
+        Кортеж из (train_dataset, val_dataset, transform_train, transform_val, label_to_index)
     """
     # Получаем трансформации
     transform_train, transform_val = get_transforms(config["model"]["name"])
@@ -42,11 +67,40 @@ def load_datasets(config: Dict[str, Any]) -> Tuple:
     df_train = pd.read_csv(config["data"]["train_path"])
     df_val = pd.read_csv(config["data"]["val_path"])
     
-    # Создаем датасеты
-    train_dataset = d.ImageLabeledDataset(df_train, transform=transform_train)
-    val_dataset = d.ImageQueryGalleryLabeledDataset(df_val, transform=transform_val)
+    # Проверяем, нужен ли ремаппинг меток для ArcFace
+    need_remap = (config["loss"]["name"] == "ArcFaceLoss" and 
+                 config["loss"].get("remap_labels2ArcFace", False))
     
-    return train_dataset, val_dataset, transform_train, transform_val
+    label_to_index = None
+    
+    if need_remap: # Только для случая loss = ArcFace 
+        # Создаем отображение меток в индексы от 0 до num_classes-1
+        unique_labels = sorted(df_train['label'].unique())
+        label_to_index = {label: idx for idx, label in enumerate(unique_labels)}
+        
+        # Применяем отображение к данным
+        df_train_mapped = df_train.copy()
+        df_val_mapped = df_val.copy()
+        
+        df_train_mapped['original_label'] = df_train_mapped['label']
+        df_train_mapped['label'] = df_train_mapped['label'].map(label_to_index)
+        
+        df_val_mapped['original_label'] = df_val_mapped['label']
+        df_val_mapped['label'] = df_val_mapped['label'].map(label_to_index)
+        
+        # Создаем датасеты с ремаппингом
+        train_dataset = d.ImageLabeledDataset(df_train_mapped, transform=transform_train)
+        val_dataset = d.ImageQueryGalleryLabeledDataset(df_val_mapped, transform=transform_val)
+        
+        # Сохраняем отображение в датасетах для возможного восстановления
+        train_dataset.label_to_index = label_to_index
+        val_dataset.label_to_index = label_to_index
+    else: # Для случая Triplet loss
+        # Создаем датасеты без ремаппинга
+        train_dataset = d.ImageLabeledDataset(df_train, transform=transform_train)
+        val_dataset = d.ImageQueryGalleryLabeledDataset(df_val, transform=transform_val)
+    
+    return train_dataset, val_dataset, transform_train, transform_val, label_to_index
 
 
 def get_sampler(config: Dict[str, Any], dataset) -> torch.utils.data.Sampler:
